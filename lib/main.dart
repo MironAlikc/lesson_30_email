@@ -49,26 +49,28 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              CustomTextField(
-                hintText: 'Name',
-                controller: controllerName,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                hintText: 'Phone',
-                controller: controllerPhone,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                maxLines: 6,
-                hintText: 'Info',
-                controller: controllerInfo,
-              ),
-              const SizedBox(height: 20),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                CustomTextField(
+                  hintText: 'Name',
+                  controller: controllerName,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  hintText: 'Phone',
+                  controller: controllerPhone,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  maxLines: 6,
+                  hintText: 'Info',
+                  controller: controllerInfo,
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -82,20 +84,68 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> sendEmail() async {
     final Dio dio = DioSettings().dio;
-    await dio.post(
-      'https://api.emailjs.com/api/v1.0/email/send',
-      data: EmailModel(
-        templateId: AppConsts.templateId,
-        serviceId: AppConsts.serviceId,
-        userId: AppConsts.userId,
-        accessToken: AppConsts.accessToken,
-        templateParams: TemplateParams(
-          fromName: controllerName.text,
-          toName: controllerPhone.text,
-          message: controllerInfo.text,
+    try {
+      await dio.post(
+        'https://api.emailjs.com/api/v1.0/email/send',
+        data: EmailModel(
+          // templateId: AppConsts.templateId,
+          serviceId: AppConsts.serviceId,
+          userId: AppConsts.userId,
+          accessToken: AppConsts.accessToken,
+          templateParams: TemplateParams(
+            fromName: controllerName.text,
+            toName: controllerPhone.text,
+            message: controllerInfo.text,
+          ),
+        ).toJson(),
+      );
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: const Text(
+            'OK',
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.close,
+              ),
+            ),
+          ],
         ),
-      ).toJson(),
-    );
+      );
+    } catch (e) {
+      String? errorText = e.toString();
+      if (e is DioException) {
+        errorText = e.response?.data;
+//         if(e.response?.statusCode == 401){
+// Navigator.pushReplacement(context, newRoute)
+//         }
+      }
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: Text(
+            e.toString(),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.close,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
 
