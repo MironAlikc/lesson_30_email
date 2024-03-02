@@ -9,13 +9,9 @@ class DioSettings {
 
   Dio dio = Dio(
     BaseOptions(
-      // baseUrl:
-      //     "https://api.mindbodyonline.com/public/v${AppConsts.apiVersion}/",
       contentType: "application/json",
       headers: {
         "Content-Type": "application/json",
-        // "SiteId": AppConsts.siteId,
-        // "Api-Key": AppConsts.apiKey,
       },
       connectTimeout: const Duration(seconds: 40),
       receiveTimeout: const Duration(seconds: 40),
